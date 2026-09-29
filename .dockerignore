@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+data
+artifacts
+node_modules
+*.sqlite*
+*.log
+credentials*
+plan.md
+.ssh
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*

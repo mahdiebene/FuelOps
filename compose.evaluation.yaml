@@ -1,0 +1,34 @@
+name: fuelops-evaluation
+services:
+  evaluation-simulator:
+    image: asifmahmoud414/bup-fuel-supply-simulator:1.0.0@sha256:7067050693f49d377d91ca91f2faa6e63f673f69a69429d4693e78e9c0598e92
+    environment:
+      SIMULATOR_START_MODE: paused
+      SIMULATION_SPEED: "8"
+      TICK_MINUTES: "15"
+    # Deliberately no host ports, external networks, or demo volumes.
+    mem_limit: 1g
+    cpus: 1
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "2" }
+  evaluation-runner:
+    build: .
+    command: ["node", "scripts/evaluate.mjs"]
+    environment:
+      ALLOW_EVALUATION_RESET: "true"
+      SIMULATOR_BASE_URL: http://evaluation-simulator:8000
+      EVALUATION_TICKS: "96"
+      EVALUATION_CADENCE: "4"
+      EVIDENCE_PATH: /data/evidence
+    volumes:
+      - evaluation-data:/data
+    depends_on:
+      - evaluation-simulator
+    mem_limit: 512m
+    cpus: 1
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "2" }
+volumes:
+  evaluation-data:

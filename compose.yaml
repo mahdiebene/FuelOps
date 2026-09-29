@@ -1,0 +1,46 @@
+name: fuelops
+services:
+  simulator-api:
+    image: asifmahmoud414/bup-fuel-supply-simulator:1.0.0@sha256:7067050693f49d377d91ca91f2faa6e63f673f69a69429d4693e78e9c0598e92
+    environment:
+      SIMULATION_SPEED: "8"
+      TICK_MINUTES: "15"
+      SIMULATOR_START_MODE: paused
+    ports:
+      - "127.0.0.1:18091:8000"
+    restart: unless-stopped
+    mem_limit: 1g
+    cpus: 1.5
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  app:
+    image: fuelops-app:0.1.0
+    build: .
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3000"
+      SIMULATOR_BASE_URL: http://simulator-api:8000
+      DATABASE_PATH: /data/fuelops.sqlite
+      EVIDENCE_PATH: /data/evidence
+      SELF_TEST_MODE: "true"
+      POLL_MS: "500"
+    ports:
+      - "127.0.0.1:18090:3000"
+    volumes:
+      - app-data:/data
+    depends_on:
+      - simulator-api
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 1
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+volumes:
+  app-data:
