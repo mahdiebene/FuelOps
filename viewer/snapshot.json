@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "mode": "SAVED_READ_ONLY_SNAPSHOT",
+  "capturedAt": "2026-09-29T05:28:59.948Z",
+  "source": "Official participant simulator; preserved private demo; not a live feed or scored run",
+  "instance": {
+    "tick": 26,
+    "tick_minutes": 15,
+    "sim_time": "2026-01-01T06:30:00",
+    "status": "PAUSED"
+  },
+  "metrics": {
+    "served_demand_liters": 17809.738,
+    "unmet_demand_liters": 0,
+    "service_level": 1
+  },
+  "stations": [
+    {
+      "id": "station-mirpur",
+      "name": "Mirpur Fuel Station",
+      "status": "OPEN",
+      "inventory": {
+        "DIESEL": 7358.855,
+        "PETROL": 6931.281,
+        "OCTANE": 3915.647
+      },
+      "capacity": {
+        "DIESEL": 15000,
+        "PETROL": 14000,
+        "OCTANE": 9000
+      }
+    },
+    {
+      "id": "station-tongi",
+      "name": "Tongi Industrial Station",
+      "status": "OPEN",
+      "inventory": {
+        "DIESEL": 9725.756,
+        "PETROL": 5350.841,
+        "OCTANE": 3179.308
+      },
+      "capacity": {
+        "DIESEL": 18000,
+        "PETROL": 9000,
+        "OCTANE": 6000
+      }
+    },
+    {
+      "id": "station-karnaphuli",
+      "name": "Karnaphuli Highway Station",
+      "status": "OPEN",
+      "inventory": {
+        "DIESEL": 6070.571,
+        "PETROL": 6906.038,
+        "OCTANE": 3716.583
+      },
+      "capacity": {
+        "DIESEL": 14000,
+        "PETROL": 15000,
+        "OCTANE": 9000
+      }
+    },
+    {
+      "id": "station-coxsbazar",
+      "name": "Cox's Bazar Regional Station",
+      "status": "OPEN",
+      "inventory": {
+        "DIESEL": 6127.365,
+        "PETROL": 6032.075,
+        "OCTANE": 3529.942
+      },
+      "capacity": {
+        "DIESEL": 12000,
+        "PETROL": 12000,
+        "OCTANE": 7000
+      }
+    }
+  ],
+  "depots": [
+    {
+      "id": "depot-gazipur",
+      "name": "Gazipur Depot",
+      "status": "OPEN"
+    },
+    {
+      "id": "depot-patiya",
+      "name": "Patiya Depot",
+      "status": "OPEN"
+    }
+  ],
+  "routes": [
+    {
+      "id": "route-gazipur-mirpur",
+      "source_depot_id": "depot-gazipur",
+      "destination_station_id": "station-mirpur",
+      "transit_ticks": 2,
+      "status": "DISRUPTED"
+    },
+    {
+      "id": "route-gazipur-tongi",
+      "source_depot_id": "depot-gazipur",
+      "destination_station_id": "station-tongi",
+      "transit_ticks": 2,
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "route-patiya-karnaphuli",
+      "source_depot_id": "depot-patiya",
+      "destination_station_id": "station-karnaphuli",
+      "transit_ticks": 2,
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "route-patiya-coxsbazar",
+      "source_depot_id": "depot-patiya",
+      "destination_station_id": "station-coxsbazar",
+      "transit_ticks": 3,
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "route-gazipur-karnaphuli",
+      "source_depot_id": "depot-gazipur",
+      "destination_station_id": "station-karnaphuli",
+      "transit_ticks": 4,
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "route-patiya-mirpur",
+      "source_depot_id": "depot-patiya",
+      "destination_station_id": "station-mirpur",
+      "transit_ticks": 4,
+      "status": "AVAILABLE"
+    }
+  ],
+  "allocations": [
+    {
+      "id": 1,
+      "source_depot_id": "depot-gazipur",
+      "destination_station_id": "station-tongi",
+      "fuel_type": "DIESEL",
+      "quantity": 754,
+      "actual_arrival_tick": 18,
+      "status": "ARRIVED"
+    }
+  ],
+  "plan": {
+    "model": "documented-profile-v1",
+    "horizonTicks": 48,
+    "assumption": "Documented demand prior; 10% uncalibrated reserve; conservative dispatch and arrival accounting. Estimates, not guaranteed outcomes.",
+    "rows": [
+      {
+        "stationId": "station-mirpur",
+        "fuel": "PETROL",
+        "inbound": 0,
+        "shortage": 38,
+        "unmet": 3079.81275
+      },
+      {
+        "stationId": "station-mirpur",
+        "fuel": "OCTANE",
+        "inbound": 0,
+        "shortage": 39,
+        "unmet": 1423.603
+      },
+      {
+        "stationId": "station-tongi",
+        "fuel": "DIESEL",
+        "inbound": 0,
+        "shortage": 44,
+        "unmet": 642.9940000000017
+      },
+      {
+        "stationId": "station-mirpur",
+        "fuel": "DIESEL",
+        "inbound": 0,
+        "shortage": 45,
+        "unmet": 745.3637500000004
+      },
+      {
+        "stationId": "station-karnaphuli",
+        "fuel": "DIESEL",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-karnaphuli",
+        "fuel": "OCTANE",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-karnaphuli",
+        "fuel": "PETROL",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-tongi",
+        "fuel": "PETROL",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-tongi",
+        "fuel": "OCTANE",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-coxsbazar",
+        "fuel": "PETROL",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-coxsbazar",
+        "fuel": "DIESEL",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      },
+      {
+        "stationId": "station-coxsbazar",
+        "fuel": "OCTANE",
+        "inbound": 0,
+        "shortage": null,
+        "unmet": 0
+      }
+    ],
+    "proposals": [
+      {
+        "source_depot_id": "depot-patiya",
+        "destination_station_id": "station-mirpur",
+        "fuel_type": "PETROL",
+        "quantity": 4080,
+        "etaTick": 31,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      },
+      {
+        "source_depot_id": "depot-patiya",
+        "destination_station_id": "station-mirpur",
+        "fuel_type": "OCTANE",
+        "quantity": 1957,
+        "etaTick": 31,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      },
+      {
+        "source_depot_id": "depot-gazipur",
+        "destination_station_id": "station-tongi",
+        "fuel_type": "DIESEL",
+        "quantity": 1679,
+        "etaTick": 29,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      },
+      {
+        "source_depot_id": "depot-patiya",
+        "destination_station_id": "station-mirpur",
+        "fuel_type": "DIESEL",
+        "quantity": 1555,
+        "etaTick": 31,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      },
+      {
+        "source_depot_id": "depot-patiya",
+        "destination_station_id": "station-karnaphuli",
+        "fuel_type": "DIESEL",
+        "quantity": 478,
+        "etaTick": 29,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      },
+      {
+        "source_depot_id": "depot-patiya",
+        "destination_station_id": "station-karnaphuli",
+        "fuel_type": "OCTANE",
+        "quantity": 150,
+        "etaTick": 29,
+        "reason": "48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel"
+      }
+    ],
+    "blocked": []
+  },
+  "evaluation": {
+    "version": "Historical v1 — original top-up planner",
+    "runId": "43a1da00-b2de-4890-b08b-0ab4fe304793",
+    "timestamp": "2026-09-29T04:52:18.167Z",
+    "ticks": 96,
+    "decisionEveryTicks": 4,
+    "seed": 12345,
+    "scenarios": [
+      {
+        "id": "normal",
+        "runs": [
+          {
+            "policy": "fuelops",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 151,
+            "acceptedLiters": 52448
+          },
+          {
+            "policy": "threshold",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 13,
+            "acceptedLiters": 72920
+          },
+          {
+            "policy": "no-action",
+            "service": 0.879158,
+            "unmetLiters": 11244.848,
+            "shipments": 0,
+            "acceptedLiters": 0
+          }
+        ]
+      },
+      {
+        "id": "demand-spike",
+        "runs": [
+          {
+            "policy": "fuelops",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 191,
+            "acceptedLiters": 150356
+          },
+          {
+            "policy": "threshold",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 25,
+            "acceptedLiters": 133986
+          },
+          {
+            "policy": "no-action",
+            "service": 0.553832,
+            "unmetLiters": 69201.324,
+            "shipments": 0,
+            "acceptedLiters": 0
+          }
+        ]
+      },
+      {
+        "id": "route-disruption",
+        "runs": [
+          {
+            "policy": "fuelops",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 151,
+            "acceptedLiters": 52448
+          },
+          {
+            "policy": "threshold",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 14,
+            "acceptedLiters": 69376
+          },
+          {
+            "policy": "no-action",
+            "service": 0.879158,
+            "unmetLiters": 11244.848,
+            "shipments": 0,
+            "acceptedLiters": 0
+          }
+        ]
+      },
+      {
+        "id": "supply-shortfall",
+        "runs": [
+          {
+            "policy": "fuelops",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 151,
+            "acceptedLiters": 52448
+          },
+          {
+            "policy": "threshold",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 13,
+            "acceptedLiters": 72920
+          },
+          {
+            "policy": "no-action",
+            "service": 0.879158,
+            "unmetLiters": 11244.848,
+            "shipments": 0,
+            "acceptedLiters": 0
+          }
+        ]
+      },
+      {
+        "id": "combined",
+        "runs": [
+          {
+            "policy": "fuelops",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 183,
+            "acceptedLiters": 150356
+          },
+          {
+            "policy": "threshold",
+            "service": 1,
+            "unmetLiters": 0,
+            "shipments": 26,
+            "acceptedLiters": 133998
+          },
+          {
+            "policy": "no-action",
+            "service": 0.553832,
+            "unmetLiters": 69201.324,
+            "shipments": 0,
+            "acceptedLiters": 0
+          }
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "evaluationSha256": "cf0d770c86fc6b15e7cbb0b14531569ec36235c44814f1c2cc96713edc56358d",
+    "auditSha256": "b546ce7754c1597a18a13186ed323b19f44990e2128373a3376ae562f75ba519"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="FuelOps: forecast-informed fuel supply decisions. Explore the read-only simulator demo and measured historical evidence.">
+  <meta name="theme-color" content="#0a111b">
+  <title>FuelOps — Supply intelligence</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="FuelOps home"><span class="brand-mark">F</span>FuelOps<span class="brand-dot">.</span></a>
+    <p class="workspace-label">SUPPLY INTELLIGENCE</p>
+    <nav aria-label="Dashboard views" role="tablist" aria-orientation="vertical">
+      <button id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" data-tab="overview"><span aria-hidden="true">◈</span> Network overview</button>
+      <button id="tab-evidence" role="tab" aria-selected="false" aria-controls="evidence" tabindex="-1" data-tab="evidence"><span aria-hidden="true">▥</span> Measured evidence</button>
+      <button id="tab-system" role="tab" aria-selected="false" aria-controls="system" tabindex="-1" data-tab="system"><span aria-hidden="true">◎</span> How it works</button>
+    </nav>
+    <div class="sidebar-bottom"><span class="tag">PUBLIC VIEWER</span><p>See the decisions.<br>Keep control private.</p><small>Participant simulator<br>Bangladesh fuel network</small></div>
+  </aside>
+  <main id="main" tabindex="-1">
+    <header class="topbar"><span class="breadcrumb">Workspace <span>/</span> <strong>Demo network</strong></span><span class="read-only"><span aria-hidden="true">◇</span> Read-only access</span></header>
+    <div class="hero"><div><p class="eyebrow">ANTICIPATE. ALLOCATE. RECOVER.</p><h1 id="page-title">A clearer view of your supply.</h1><p class="subtitle">Forecast-informed decisions. Visible constraints. Human control.</p></div><button id="download" class="button" disabled>Download snapshot <span aria-hidden="true">↗</span></button></div>
+    <div class="snapshot-note"><span class="status-dot" aria-hidden="true"></span><div><strong>Saved simulator snapshot · not a live feed</strong><p id="capture">Loading the published snapshot…</p></div><span class="tag">NO DISPATCH ACCESS</span></div>
+    <div id="notice" role="status" aria-live="polite"><span id="notice-text">Loading verified demo data…</span><button id="retry" class="button" hidden>Try again</button></div>
+    <noscript><p class="error">Enable JavaScript to explore the dashboard. This is a static, read-only viewer; no simulator controls are exposed.</p></noscript>
+    <section id="overview" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="stats">
+        <article><span class="stat-label">DEMAND SERVED</span><strong id="service">—</strong><small>Official metric · saved demo</small></article>
+        <article><span class="stat-label">PROJECTED SHORTAGE PAIRS</span><strong id="risks">—</strong><small>Station × fuel · next 48 ticks</small></article>
+        <article><span class="stat-label">ROUTES AVAILABLE</span><strong id="routes-count">—</strong><small>Constraints at capture time</small></article>
+        <article><span class="stat-label">SIMULATION CLOCK</span><strong id="tick">—</strong><small id="sim-time">Paused participant world</small></article>
+      </div>
+      <div class="overview-grid">
+        <section class="panel network-panel"><div class="panel-heading"><div><p class="eyebrow muted">THE BIG PICTURE</p><h2>Connected supply network</h2></div><span class="tag">SCHEMATIC</span></div><p class="panel-description">Two depots. Four stations. Every route has a constraint.</p><div id="network" class="network"></div><div class="legend"><span><i class="line available"></i>Available</span><span><i class="line disrupted"></i>Disrupted</span><span>Illustrative layout · not a geographic map</span></div></section>
+        <section class="panel decision-panel"><div class="panel-heading"><div><p class="eyebrow">DECISION SUPPORT</p><h2>What needs attention</h2></div><span aria-hidden="true" class="big-arrow">↗</span></div><p id="attention" class="attention">Reading the captured plan…</p><div id="constraints"></div><p class="footnote">Forecasts are estimates, not service guarantees. Actions require approval in the separate private operator app.</p></section>
+      </div>
+      <section class="panel"><div class="panel-heading"><div><h2>Station readiness</h2><p class="panel-description">Inventory and forecast exposure at the saved tick.</p></div><label class="select-label">Fuel <select id="fuel"><option value="ALL">All fuels</option><option>DIESEL</option><option>PETROL</option><option>OCTANE</option></select></label></div><div id="stations" class="station-grid"></div></section>
+      <div class="lower-grid"><section class="panel"><div class="panel-heading"><h2>Captured recommendations</h2><span class="tag">V1 PLANNER</span></div><div id="recommendations"></div><p class="footnote">These are historical proposals, not shipments sent by this website.</p></section><section class="panel"><div class="panel-heading"><h2>Shipment history</h2><span class="tag">SIMULATION ONLY</span></div><div id="shipments"></div><p class="footnote">Accepted ≠ arrived. Status shown is the official saved allocation status.</p></section></div>
+    </section>
+    <section id="evidence" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+      <div class="section-intro"><p class="eyebrow">EVIDENCE, NOT HYPE</p><h2>A measured result. With its limits.</h2><p>The original planner and threshold baseline both reached 100% service in all five historical scenarios. The original planner used more shipments. That is a service tie—not a superiority claim.</p></div>
+      <div class="evidence-banner"><strong>Historical v1 only</strong><span>15 runs · 5 scenarios · 96 ticks · seed 12345 · decisions every 4 ticks</span><p>The batching v2 work is separate. These results do not validate v2. No live-speed, cost-saving, or scored-run claim is made.</p></div>
+      <section class="panel"><div class="panel-heading"><div><h2>Service and shipment trade-offs</h2><p class="panel-description">Matched initial settings and demand traces; independently audited offline.</p></div><label class="select-label">Scenario <select id="scenario" aria-label="Evaluation scenario"></select></label></div><div id="comparison" class="comparison"></div><div class="table-wrap"><table><caption>Historical policy outcomes</caption><thead><tr><th scope="col">Policy</th><th scope="col">Service</th><th scope="col">Unmet demand</th><th scope="col">Shipments</th><th scope="col">Accepted fuel</th></tr></thead><tbody id="outcomes"></tbody></table></div><p class="footnote">Shipment count is not a cost metric. Accepted liters are not evidence of allocation efficiency. One seed and a 96-tick horizon do not establish general superiority.</p></section>
+      <section class="panel"><h2>Traceable by design</h2><p class="panel-description">The downloadable snapshot contains sanitized outcomes and SHA-256 fingerprints of the parsed source report and audit. Raw simulator histories, SQLite ledgers, credentials, and private infrastructure details are not published.</p><dl id="provenance" class="provenance"></dl></section>
+    </section>
+    <section id="system" role="tabpanel" aria-labelledby="tab-system" hidden>
+      <div class="section-intro"><p class="eyebrow">SMALL SYSTEM. EXPLICIT BOUNDARIES.</p><h2>From observation to accountable action.</h2><p>The public viewer explains the system. The private operator application owns simulator access, approval, and durable execution.</p></div>
+      <div class="workflow"><article class="panel"><span class="step">01</span><h2>Observe</h2><p>Validate official inventory, routes, demand profiles, and incoming fuel. Retain a last-good view when data degrades.</p></article><article class="panel"><span class="step">02</span><h2>Anticipate</h2><p>Project 48 ticks of demand. Account for inbound shipments, physical capacity, depot stock, and route constraints.</p></article><article class="panel"><span class="step">03</span><h2>Approve</h2><p>A human reviews each feasible proposal. Execution is paused/manual only; stale data and uncertain writes block new dispatch.</p></article><article class="panel"><span class="step">04</span><h2>Reconcile</h2><p>Persist intents in SQLite, suppress exact-key duplicates, and reconcile uncertain outcomes before another shipment.</p></article></div>
+      <section class="panel boundaries"><h2>What this public site can—and cannot—do</h2><ul><li>Explore a sanitized, dated snapshot from the official participant simulator.</li><li>Inspect historical measured outcomes without concealing ties or trade-offs.</li><li>Download only the same sanitized data already displayed here.</li><li>No operator API, simulator proxy, authentication token, writable database, dispatch, reset, or admin endpoint is deployed here.</li><li>Data does not refresh from the private simulator. Updating it requires a reviewed export and redeployment.</li></ul><p id="assumption" class="footnote"></p></section>
+    </section>
+    <footer><span class="footer-brand">FuelOps<span>.</span></span><span>Built for clarity. Designed for human control.</span><span>PUBLIC DEMO · SIMULATION ONLY</span></footer>
+  </main>
+</body>
+</html>
