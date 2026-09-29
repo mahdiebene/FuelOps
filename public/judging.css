@@ -1,0 +1,13 @@
+[hidden]{display:none!important}
+.preview-label{border:1px solid var(--amber);border-radius:10px;padding:14px 18px;margin:0 0 20px;color:var(--amber);background:#30271b;font-weight:600}
+.judge-hero{background:linear-gradient(125deg,#14342f,#121c2b 75%);padding:28px}
+.judge-hero h2{font-size:clamp(24px,3vw,36px);line-height:1.2;margin:14px 0;letter-spacing:-1px}
+.judge-hero>p{max-width:780px;font-size:16px}.judge-hero .controls{margin-top:20px}
+#judge-readiness{border-left:3px solid var(--amber);padding:10px 14px;background:#0b111c80;overflow-wrap:anywhere}
+.judge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.judge-grid .panel{margin-bottom:0}.judge-grid{margin-bottom:18px}
+.architecture{display:flex;align-items:center;gap:18px}.architecture article{flex:1;min-width:0;background:#0b111c;border:1px solid var(--border);padding:18px;border-radius:8px}.architecture strong,.architecture article span{display:block}.architecture strong{color:var(--teal);margin-bottom:8px}
+.decision-review{margin:14px 0;border-top:1px solid var(--border);padding-top:12px}.decision-review summary{cursor:pointer;color:var(--teal);font-weight:600;padding:5px 0}.decision-review p{font-size:12px}.decision-review .metric-row{align-items:flex-start;gap:16px}.decision-review .metric-row strong{text-align:right}
+button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:4px}
+.panel,.recommendation,.station,.tab{min-width:0;overflow-wrap:anywhere}.table-wrap{max-width:100%;overflow:auto}
+@media(max-width:800px){.judge-grid{grid-template-columns:1fr}.architecture{flex-direction:column;align-items:stretch}.architecture>span{text-align:center}.judge-hero{padding:18px}}
+@media(max-width:500px){main{padding:18px 12px}header,.section-heading{flex-wrap:wrap}.two-col,.station-grid{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-row{gap:10px}.metric-row strong{overflow-wrap:anywhere}.quantity{white-space:normal}.row{flex-wrap:wrap}}

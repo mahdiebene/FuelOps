@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { FUELS } from './simulator.mjs';
-import { makePlan, inbound, dispatchUsed, checkShipment } from './planner.mjs';
+import { makePlan, makeTopUpPlan, inbound, dispatchUsed, checkShipment } from './planner.mjs';
 
 export const SIMULATOR_IMAGE = 'asifmahmoud414/bup-fuel-supply-simulator:1.0.0@sha256:7067050693f49d377d91ca91f2faa6e63f673f69a69429d4693e78e9c0598e92';
 export const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -37,6 +37,7 @@ export function thresholdPlan(s) {
 }
 export const policies = {
   fuelops: makePlan,
+  'fuelops-topup': makeTopUpPlan,
   threshold: thresholdPlan,
   'no-action': s => ({ tick: s.instance.tick, model: 'no-action-v1', proposals: [], rows: [], blocked: [], plannerMs: 0 })
 };
@@ -89,7 +90,10 @@ export function compareRuns(candidate, baseline) {
   require(candidate.outcome.demand.samples > 0 && candidate.outcome.demand.samples === baseline.outcome.demand.samples &&
     candidate.outcome.demand.sha256 === baseline.outcome.demand.sha256, 'Exogenous demand mismatch; comparison rejected');
   const a = candidate.outcome.official, b = baseline.outcome.official;
+  const shipments = candidate.outcome.allocations, baselineShipments = baseline.outcome.allocations;
   return { baseline: baseline.policy, matchedDemand: true, samples: candidate.outcome.demand.samples,
+    shipmentReduction: Number.isInteger(shipments) && Number.isInteger(baselineShipments) ? baselineShipments - shipments : null,
+    shipmentReductionPercent: Number.isInteger(shipments) && baselineShipments > 0 ? 100 * (baselineShipments - shipments) / baselineShipments : null,
     serviceGainPercentagePoints: 100 * (a.service_level - b.service_level),
     unmetReductionLiters: b.unmet_demand_liters - a.unmet_demand_liters,
     unmetReductionPercent: b.unmet_demand_liters > 0 ? 100 * (b.unmet_demand_liters - a.unmet_demand_liters) / b.unmet_demand_liters : null };

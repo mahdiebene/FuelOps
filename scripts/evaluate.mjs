@@ -109,11 +109,13 @@ export async function evaluate(env = process.env) {
     caveats: ['Default official seed only; not a scored run or proof of general superiority.',
       'No warmup; all policies start at tick 0 with identical decision cadence and action bounds; observations collected every tick.',
       'Forecast is measured before each step; no probability calibration or running-speed performance claim.',
-      'Raw observations/predictions, initial/final snapshots and SQLite intents saved separately; source hashes identify the tested build.'],
+      'Raw observations/predictions, initial/final snapshots and SQLite intents saved separately; source hashes identify the tested build.',
+      'fuelops is forecast batching v2; fuelops-topup retains the original v1 trigger. Fewer shipments alone is not a service or cost win.',
+      'Batching uses a four-tick review allowance; slower manual approval or a larger evaluation cadence is not covered by that heuristic.'],
     sourceSha256: {}, scenarios: [] };
   for (const file of ['src/planner.mjs', 'src/controller.mjs', 'src/ledger.mjs', 'src/simulator.mjs', 'src/evaluation.mjs', 'scripts/evaluate.mjs'])
     report.sourceSha256[file] = createHash('sha256').update(await readFile(resolve(root, file))).digest('hex');
-  const reportPath = resolve(evidence, 'evaluation.json'), deadline = Date.now() + 600000;
+  const reportPath = resolve(evidence, 'evaluation.json'), deadline = Date.now() + 900000;
   await save(reportPath, report);
   try {
     const sim = new Simulator(config.base, { timeout: 5000 });

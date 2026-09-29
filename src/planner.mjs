@@ -51,8 +51,14 @@ export function checkShipment(s, p) {
   if (station.inventory[p.fuel_type] + reserved + p.quantity > station.capacity[p.fuel_type] + .001) return 'Destination capacity including inbound exceeded';
   return null;
 }
-export function makePlan(s) {
-  const started = performance.now(), rows = [], proposals = [], blocked = [];
+// Four ticks is a planning review allowance, NOT an automatic execution schedule.
+// Humans must still approve; a longer delay or forecast error can cause shortages.
+export const BATCH_REVIEW_TICKS = 4;
+export const makePlan = s => buildPlan(s, true);
+// Evaluation-only reference: preserves the original 100 L top-up trigger.
+export const makeTopUpPlan = s => buildPlan(s, false);
+function buildPlan(s, batching) {
+  const started = performance.now(), rows = [], proposals = [], blocked = [], deferred = [];
   const work = structuredClone(s);
   for (const station of s.stations) for (const fuel of FUELS) {
     const projection = project(s, station, fuel);
@@ -63,24 +69,40 @@ export function makePlan(s) {
   for (const row of rows) {
     const station = work.stations.find(x => x.id === row.stationId);
     if (row.outage) { blocked.push({ stationId: station.id, fuel: row.fuel, reason: 'Station outage — no dispatch' }); continue; }
-    const target = Array.from({ length: 48 }, (_, i) => demand(s, station, row.fuel, i + 1)).reduce((a, b) => a + b, 0) * 1.10;
+    const forecast = Array.from({ length: 48 }, (_, i) => demand(s, station, row.fuel, i + 1));
+    const target = Math.min(batching ? row.capacity : Infinity, forecast.reduce((a, b) => a + b, 0) * 1.10);
     const deficit = Math.floor(target - row.inventory - row.inbound);
-    if (deficit < 100) continue;
+    if (!batching && deficit < 100) continue;
     const routes = work.routes.filter(r => r.destination_station_id === station.id && r.status === 'AVAILABLE').sort((a, b) => a.transit_ticks - b.transit_ticks || a.id.localeCompare(b.id));
-    let selected;
+    let selected, waiting = false;
     for (const r of routes) {
       const d = work.depots.find(x => x.id === r.source_depot_id);
       const free = station.capacity[row.fuel] - station.inventory[row.fuel] - inbound(work, station, row.fuel).reduce((n, a) => n + a.quantity, 0);
-      const quantity = Math.floor(Math.min(deficit, r.max_shipment, d.inventory[row.fuel], d.dispatch_capacity_per_tick - dispatchUsed(work, d.id), free));
+      const protectionTicks = Math.min(48, 1 + r.transit_ticks + BATCH_REVIEW_TICKS);
+      const protection = batching ? project(s, station, row.fuel, protectionTicks) : null;
+      const reorder = Math.min(target, Math.max(target * .5, forecast.slice(0, protectionTicks).reduce((a, b) => a + b, 0) * 1.10));
+      // A late inbound shipment must not hide a shortage that a new shipment can bridge.
+      const needed = batching ? Math.max(deficit, Math.ceil(protection.unmet * 1.10)) : deficit;
+      const quantity = Math.floor(Math.min(needed, r.max_shipment, d.inventory[row.fuel], d.dispatch_capacity_per_tick - dispatchUsed(work, d.id), free));
       const p = { source_depot_id: d.id, destination_station_id: station.id, route_id: r.id, fuel_type: row.fuel, quantity };
       if (quantity < 100 || checkShipment(work, p)) continue;
-      selected = { ...p, etaTick: s.instance.tick + 1 + r.transit_ticks, reason: '48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel', estimatedUnmetAvoided: Math.max(0, row.unmet - project(s, station, row.fuel, 48, [{ ...p, expected_arrival_tick: s.instance.tick + 1 + r.transit_ticks }]).unmet) };
+      const extra = [{ ...p, expected_arrival_tick: s.instance.tick + 1 + r.transit_ticks }];
+      const urgent = batching && protection.unmet - project(s, station, row.fuel, protectionTicks, extra).unmet > .001;
+      if (batching && !urgent && (deficit < 100 || row.inventory + row.inbound > reorder)) { waiting = true; break; }
+      selected = { ...p, etaTick: s.instance.tick + 1 + r.transit_ticks,
+        reason: batching ? `${urgent ? 'Shortage-before-next-review override' : 'Reorder point reached'}; refill toward 48-tick forecast + 10% reserve, capped at tank capacity; stock and inbound reserved` : '48-tick forecast plus 10% heuristic reserve, minus stock and incoming fuel',
+        ...(batching ? { batching: { trigger: urgent ? 'shortage' : 'reorder', reorderLiters: reorder, targetLiters: target, protectionTicks, reviewTicks: BATCH_REVIEW_TICKS } } : {}),
+        estimatedUnmetAvoided: Math.max(0, row.unmet - project(s, station, row.fuel, 48, extra).unmet) };
       d.inventory[row.fuel] -= quantity;
       work.allocations.push({ ...p, status: 'PENDING', created_tick: s.instance.tick });
       break;
     }
     if (selected) proposals.push(selected);
+    else if (batching && waiting) deferred.push({ stationId: station.id, fuel: row.fuel, reason: 'Above reorder point; no avoidable shortage before the next review plus delivery. Recheck each snapshot.' });
+    else if (batching && deficit < 100 && row.shortage === null) continue;
     else blocked.push({ stationId: station.id, fuel: row.fuel, reason: 'No feasible route / stock / dispatch / destination capacity' });
   }
-  return { tick: s.instance.tick, horizonTicks: 48, model: 'documented-profile-v1', assumption: 'Documented demand prior; 10% uncalibrated reserve; conservative dispatch and arrival accounting. Estimates, not guaranteed outcomes.', rows, proposals, blocked, plannerMs: performance.now() - started };
+  return { tick: s.instance.tick, horizonTicks: 48, model: batching ? 'documented-profile-batched-v2' : 'documented-profile-v1',
+    assumption: batching ? 'Forecast batching: reorder at max(50% of capped target, lead + 4-tick review demand with 10% reserve); shortage override only when delivery can help. Manual paused approval; review allowance and reserve are heuristics, not service guarantees.' : 'Documented demand prior; 10% uncalibrated reserve; conservative dispatch and arrival accounting. Estimates, not guaranteed outcomes.',
+    rows, proposals, blocked, ...(batching ? { deferred } : {}), plannerMs: performance.now() - started };
 }

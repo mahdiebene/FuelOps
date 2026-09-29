@@ -1,5 +1,76 @@
 # FuelOps implementation status
 
+## Live v2 release — 2026-09-29, 07:25 UTC
+
+User authorized finishing v2 with 30+ minutes remaining. **The private v2 judging
+deployment is live and tested:** http://127.0.0.1:18093/#judging on the authorized
+PC. This supersedes the earlier local-only/live-rehearsal blocker below.
+
+- Separate VPS project `fuelops-judging-v2-20260929071521`, release directory
+  `/opt/fuelops-judging-v2-20260929071521`, official pinned simulator, dedicated
+  network and SQLite volume. App on VPS loopback 18093; simulator has no host port.
+- **65/65 tests** locally and in the Linux Node image. Initial Linux glob command
+  found zero tests and is NOT counted; explicit filenames produced the real pass.
+- Official v2 integration **PASS, seven checks**: real acceptance/depot reservation,
+  durable duplicate suppression, official exact-key replay, arrival, stale-data
+  block, disarmed recovery and disrupted-route exclusion.
+- Two clean-profile Chrome action rehearsals passed, including 1440/390/320px,
+  four views, decision inspection, real approval/arrival, stale blocking and fresh
+  disarmed recovery. No browser errors. No images read in chat.
+- Cached dashboard-read load, three 10-second stages, concurrency 1/10/20,
+  **4,517 requests, zero errors**, all ready. At 20: 146.6 requests/s, p95 207.3 ms,
+  p99 305.9 ms. Generator shared the one-CPU app container; not dispatch throughput.
+- Final app-only rebuild/restart preserved the simulator world, run and durable
+  intents; recovered ready and disarmed. Simulator was NOT restarted.
+- Final preparation: **tick 36, PAUSED, disarmed, zero uncertain writes**; first
+  proposal **5,000 L PETROL, Patiya → Mirpur**, avoiding disrupted Gazipur route.
+  This is a deliberately prepared official test world, not production data.
+- Existing v1 remains at port 18090, tick 26, with run/world/intents unchanged.
+  Public historical viewer and other VPS services were not changed.
+- The deployment was built from the working tree before the user requested a
+  release commit/push. SHA-256 manifests identify the exact uploaded source and
+  running image independently of Git history. No paid AI calls were made.
+- GitHub's saved OAuth credential lacks `workflow` scope. The CI workflow is
+  retained locally but excluded from this release commit; local/Linux test passes
+  are verified, and no hosted CI run is claimed.
+
+Reproducible new scripts: `F:\Mahdi\FuelOps\scripts\prepare-judging.mjs` and
+`F:\Mahdi\FuelOps\scripts\judge-live-check.mjs`. Both require explicit mutation
+opt-in and are restricted to v2 port 18093; do not run during judging.
+
+Evidence: `F:\Mahdi\FuelOps\artifacts\v2-release\final-release.json`,
+`browser-live-actions.json`, `integration.json`, `load-test.json`, and the explicit
+Linux/local test logs in that same directory. `SECOND_JUDGING.md` contains the
+current one-tab live walkthrough, tunnel recovery, logs, restart and fallback.
+
+**Still not proven:** v2 comparative improvement. The interrupted 20-run matched
+evaluation remains a separate gate; integration and a successful demonstration
+do not establish policy superiority. Manual paused execution only.
+
+## Historical deadline verification — 2026-09-29, 07:03 UTC
+
+Feature freeze for second judging. Re-ran **64/64 tests**, the current historical
+UI Chrome checks (four views, 1440/390/320px, inspection and disconnect/recovery),
+and a clean-profile read-only check of the existing live operator app: all PASS.
+No images were read in chat. `git diff --check` passed.
+
+- `http://127.0.0.1:18090/`: existing live **v1** deployment through a private SSH
+  tunnel. DATA VERIFIED, PAUSED at tick 26, disarmed, zero uncertain intents.
+  Four stations, six proposals, one ARRIVED allocation. Before/after checks show
+  unchanged run, world and durable intents; no remote mutations or redeployment.
+- `http://127.0.0.1:18092/#judging`: local **v2 historical** rehearsal, all writes
+  blocked. Current calculations on a saved no-action crisis world, not v2 outcomes.
+- Local Docker engine remains unavailable. Isolated live v2 rehearsal and the
+  interrupted matched v2 evaluation are still unverified; not release-ready claims.
+- Four-minute runbook: `F:\Mahdi\FuelOps\SECOND_JUDGING.md`. Only presentation
+  wording changed in product code during this continuation; pre-existing planner,
+  controller, evaluation, ledger and public viewer changes were preserved.
+- No paid AI calls, commits, staging, pushes or deployment in this continuation.
+
+Reports: `F:\Mahdi\FuelOps\artifacts\deadline-final-verification.json` and
+`F:\Mahdi\FuelOps\artifacts\deadline-launch.json`. These are point-in-time checks;
+recheck both URLs before presenting. Older milestones below remain historical.
+
 Started after user approval. Implementation workspace: `F:\Mahdi\FuelOps`.
 Published design reference: https://github.com/mahdiebene/Hackathon_Plan/blob/main/plan.md.
 Private infrastructure access instructions are not included in this repository.
@@ -95,7 +166,7 @@ the official simulator image by digest. Ledger persistence/restart is tested.
   safety checks were relaxed. The validation default is now 96 ticks with equal
   four-tick decision opportunities for every policy, not a claim about 192 ticks.
 
-### Verified replay results — 2026-09-29
+### Historical v1 replay results — 2026-09-29
 
 Run `43a1da00-b2de-4890-b08b-0ab4fe304793`: **PASS**, 15 runs / five scenarios,
 96 ticks each, four-tick decisions, seed 12345, no warmup. Each comparison has
@@ -141,3 +212,35 @@ The evaluation simulator is stopped and its evidence retained. The prepared demo
 remains ready, disarmed and PAUSED at tick 26 with its run, allocations and intents
 unchanged. New evaluation/report code is local only; no demo application deployment
 was performed. The 41-test suite passed both locally and in the Linux Node image.
+
+## Continuation: forecast batching v2
+
+Implemented locally, not deployed: separate reorder/refill thresholds, capped
+48-tick target, lead-time + four-tick review protection, actionable-shortage
+override for late inbound, and visible deferral reasons. All physical and durable
+execution guards remain unchanged. Original v1 behavior is retained as
+`fuelops-topup` in the evaluator; the suite now has four policies / 20 runs.
+
+Unit regressions cover reorder boundaries, same-tick suppression, inbound timing,
+small urgent shipments, capped targets, alternate routes, non-mutating shared
+reservations, matched fixture replay, and honest shipment deltas in the UI.
+Official v2 outcomes must be verified independently; the historical v1 evidence
+above is retained unchanged and is not evidence of a v2 pass.
+
+## Second-judging presentation candidate
+
+Local additions: planning-time decision inspection (thresholds, shortage timing,
+shared reservations and route alternatives), an in-app judge walkthrough and
+architecture view, and a loopback-only historical preview with server-side write
+blocking. The preview recomputes the current planner on a saved official capture;
+it is not a simulator replay, live connection or v2 outcome experiment.
+
+`F:\Mahdi\FuelOps\compose.judging.yaml` defines a separate official simulator,
+app, network and data volume on app port 18093. No private-demo or public-viewer
+deployment is changed. Docker's local engine was unavailable during preparation;
+live rehearsal remains a release gate. The earlier v2 evaluation lifecycle report
+records FAIL after an SSH timeout, not a completed independent comparison.
+
+See `F:\Mahdi\FuelOps\SECOND_JUDGING.md` for the runbook and evidence limitations.
+The new CI workflow tests and builds on push/PR; no hosted CI pass is asserted
+before it actually runs.

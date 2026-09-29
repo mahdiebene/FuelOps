@@ -1,5 +1,18 @@
 # FuelOps
 
+## Second-judging live v2
+
+Start with `F:\Mahdi\FuelOps\SECOND_JUDGING.md`: four-minute presentation,
+decision inspection, historical read-only rehearsal and a separate live-demo
+Compose project. `npm run judge:preview` serves the saved official capture on
+loopback port 18092 with all writes blocked; it is not a live simulator.
+The isolated live operator deployment uses port 18093 and separate state.
+The private VPS v2 deployment is now available through the authorized PC's tunnel
+at **http://127.0.0.1:18093/#judging**. Official integration and live browser
+approval/arrival/stale/recovery passed. Start with the runbook, not the v1 tab.
+Neither mode changes the public viewer or the preserved private demo.
+Matched v2 outcome improvement is still unproven; live functionality is a separate gate.
+
 An operator control room for the official BUP fuel-supply simulator. Node 24
 built-ins, SQLite, plain HTML/CSS/JS; no npm dependencies or paid AI calls.
 
@@ -7,6 +20,7 @@ built-ins, SQLite, plain HTML/CSS/JS; no npm dependencies or paid AI calls.
 
 - Real REST snapshots, four-station inventory and route constraints.
 - 48-tick documented-profile demand forecast and feasible replenishment proposals.
+- Forecast-based reorder/refill batching with a lead-time shortage override.
 - Inbound-aware quantities, shared dispatch limits, inspectable deterministic reasons.
 - Human approval, durable SQLite intent BEFORE POST, exact-key duplicate suppression.
 - Stale-data write blocking, uncertain-write reconciliation, explicit re-arming.
@@ -138,6 +152,30 @@ It verifies four official stations, navigation, console errors and a screenshot.
 An existing tunnel to the deployed app is required; APP_URL can override its URL.
 Each run uses a fresh temporary Chrome profile and an ephemeral debugging port.
 
+## Forecast batching (v2)
+
+The current v2 planner separates the reorder point from the refill target:
+
+- **Target:** 48-tick forecast plus 10% heuristic reserve, capped at tank capacity.
+- **Reorder:** the larger of half the target or forecast demand over route lead
+  time (including the conservative one-tick departure buffer) plus a four-tick
+  review allowance, with 10% reserve; capped at the target.
+- Compare the reorder point against on-hand **plus all active inbound**. Above
+  the point, defer routine top-ups rather than sending another 100 L shipment.
+- Override deferral when the conservative projection finds a shortage before the
+  next review plus delivery **and a physically feasible new arrival reduces it**.
+  This can bridge a gap before late inbound arrives, but cannot bypass reserved
+  tank space, route/depot limits or the existing 100 L minimum.
+- Recompute from each snapshot; no in-memory cooldown or restart-sensitive batching
+  state. Deferred and blocked reasons are visible in the operator dashboard.
+
+The four-tick allowance is a planning heuristic, not an automatic execution timer
+or a promise that humans will approve in time. Forecast error, slower approval,
+delayed inbound and longer delivery times can still cause shortages. The app stays
+manual, paused-only and disarmed on restart. Batching is deployed to the separate
+v2 judging project, not the preserved v1 demo. The original top-up policy is retained only as an evaluation
+reference (`fuelops-topup`), not an operator-selectable HTTP mode.
+
 ## Isolated policy evaluation
 
 The dedicated lab NEVER connects to the prepared demo through its normal
@@ -160,13 +198,13 @@ observations, plus a compact `evaluation.json` report. Copy that report to
 `F:\Mahdi\FuelOps\artifacts\evaluation.json` for a local dashboard, or deliberately
 import it into the app's `/data/evidence/evaluation.json` after validation.
 
-- **Policies:** unchanged FuelOps planner; threshold baseline (reorder at <=25%
+- **Policies:** FuelOps forecast batching v2; original v1 top-up reference; threshold baseline (reorder at <=25%
   stock including inbound, target 75%, lowest stock fraction first, fastest feasible
   route); no-action reference. Every policy uses the same guarded controller and
   SQLite intent path; minimum dispatch is 100 L and all active shipments reserve
   shared capacity. Automated approvals exist only in this disposable test driver.
 - **Settings:** 96 ticks by default, zero warmup, one decision opportunity every
-  four paused ticks, at most 24 actions/opportunity and 4,096/run, ten-minute suite
+  four paused ticks, at most 24 actions/opportunity and 4,096/run, fifteen-minute suite
   deadline. Observations/predictions are still collected every tick.
   `EVALUATION_TICKS` is bounded to 1–384; `EVALUATION_CADENCE` to 1–16. A 192-tick
   run must be explicitly configured and measured, not inferred from a 96-tick pass.
@@ -182,7 +220,8 @@ import it into the app's `/data/evidence/evaluation.json` after validation.
   station/fuel/tick demand coverage, exact exogenous-demand hash match, reconciliation
   of rounded history totals to official metrics, no duplicate IDs/keys. An unmatched
   comparison is rejected; gains are never inferred from seed equality alone.
-- **Outcomes:** official service/served/unmet, per-station service, accepted/arrived/
+- **Outcomes:** official service/served/unmet, per-station service, shipment counts
+  and matched count reductions (negative values mean overhead), accepted/arrived/
   outstanding liters, failures, duplicate checks and paused decision wall timings.
   Negative deltas and ties are valid results. Relative unmet reduction is null when
   baseline unmet is zero. Forecast MAE/WAPE tests the existing next-step prediction;
@@ -193,12 +232,16 @@ per-shipment human reaction time, an organizer score or proof of generalized
 superiority. The operator application remains manual, paused-only and disarmed
 on restart. The policy injection hook is constructor-only, never an HTTP setting.
 
-Verified on 2026-09-29: all 15 runs passed with matching demand. FuelOps and the
+Historical v1 result on 2026-09-29: all 15 runs passed with matching demand. FuelOps and the
 threshold baseline tied at 100% service across the five scenarios; FuelOps issued
 151–191 shipments per run versus 13–26 for the threshold policy. No superiority
 claim follows from that tie. Full measurements and limitations are recorded in
 `F:\Mahdi\FuelOps\BUILD_STATUS.md` and `F:\Mahdi\FuelOps\artifacts\evaluation.json`.
 The report UI was browser-tested locally; the prepared demo was not redeployed.
+This historical result does not validate v2. The v2 suite now contains 20 runs
+(four policies x five scenarios); require its own completed, matched report before
+claiming a reduction without service loss. Neither shipment counts nor accepted
+liters alone measure cost or overall efficiency.
 
 ## 90-second demo
 

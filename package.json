@@ -8,6 +8,11 @@
     "start": "node src/server.mjs",
     "test": "node --test test/*.test.mjs",
     "load": "node scripts/load.mjs",
-    "evaluate": "node scripts/evaluate.mjs"
+    "evaluate": "node scripts/evaluate.mjs",
+    "judge:prepare": "node scripts/prepare-judge-source.mjs",
+    "judge:preview": "node scripts/judge-preview.mjs",
+    "judge:check": "node scripts/judge-check.mjs",
+    "judge:live:prepare": "node scripts/prepare-judging.mjs",
+    "judge:live:check": "node scripts/judge-live-check.mjs"
   }
 }

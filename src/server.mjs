@@ -6,12 +6,14 @@ import { timingSafeEqual } from 'node:crypto';
 import { Simulator } from './simulator.mjs';
 import { Ledger } from './ledger.mjs';
 import { Controller, ActionError } from './controller.mjs';
+import { decisionReviews } from './decision-review.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-export function createApp(controller, { evidencePath = process.env.EVIDENCE_PATH || resolve(root, 'artifacts') } = {}) {
+export function createApp(controller, { evidencePath = process.env.EVIDENCE_PATH || resolve(root, 'artifacts'), readOnly = false } = {}) {
   const timings = []; let requests = 0, errors = 0;
-  const files = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']]]);
+  const files = new Map([['/', ['index.html', 'text/html']], ['/app.js', ['app.js', 'text/javascript']], ['/style.css', ['style.css', 'text/css']], ['/judging.js', ['judging.js', 'text/javascript']], ['/judging.css', ['judging.css', 'text/css']]]);
   const assets = new Map();
+  let reviewedPlan, reviewedSnapshot, reviews = [];
   const server = createServer(async (req, res) => {
     const start = performance.now(); requests++;
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -28,7 +30,7 @@ export function createApp(controller, { evidencePath = process.env.EVIDENCE_PATH
         if (!assets.has(name)) assets.set(name, await readFile(resolve(root, 'public', name)));
         res.writeHead(200, { 'Content-Type': `${type}; charset=utf-8` }); res.end(assets.get(name)); return;
       }
-      if (req.method === 'GET' && url.pathname === '/api/health') { send(200, { status: 'alive', operationalReady: controller.ready, armed: controller.armed, issue: controller.issue, mode: 'MANUAL_PAUSED' }); return; }
+      if (req.method === 'GET' && url.pathname === '/api/health') { send(200, { status: 'alive', operationalReady: !readOnly && controller.ready, armed: !readOnly && controller.armed, issue: controller.issue, mode: readOnly ? 'SAVED_READ_ONLY_PREVIEW' : 'MANUAL_PAUSED' }); return; }
       if (req.method === 'GET' && url.pathname === '/api/reports') {
         const reports = {};
         for (const name of ['integration', 'load-test', 'evaluation']) {
@@ -39,8 +41,13 @@ export function createApp(controller, { evidencePath = process.env.EVIDENCE_PATH
       }
       if (req.method === 'GET' && url.pathname === '/api/state') {
         const sorted = [...timings].sort((a, b) => a - b);
-        send(200, { ...controller.view(), http: { requests, errors, p95Ms: sorted[Math.floor(sorted.length * .95)] ?? 0, samples: sorted.length } }); return;
+        const state = controller.view();
+        if (state.plan !== reviewedPlan || state.snapshot !== reviewedSnapshot) {
+          reviews = decisionReviews(state.snapshot, state.plan); reviewedPlan = state.plan; reviewedSnapshot = state.snapshot;
+        }
+        send(200, { ...state, ...(readOnly ? { ready: false, armed: false, selfTest: false, preview: true, mode: 'SAVED_READ_ONLY_PREVIEW' } : {}), decisionReviews: reviews, http: { requests, errors, p95Ms: sorted[Math.floor(sorted.length * .95)] ?? 0, samples: sorted.length } }); return;
       }
+      if (readOnly && !['GET', 'HEAD'].includes(req.method)) throw new ActionError('Saved read-only preview: all writes are disabled on the server', 403);
       if (req.method !== 'POST') throw new ActionError('Not found', 404);
       // No cross-origin writes, including localhost CSRF / DNS-rebinding origin mismatches.
       if (req.headers.origin) {

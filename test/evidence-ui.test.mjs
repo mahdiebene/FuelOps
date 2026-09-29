@@ -34,3 +34,9 @@ test('evidence UI suppresses deltas for failed, running, rejected and unmatched 
   const unmatched = report(); unmatched.scenarios[0].comparisons[0].matchedDemand = false; assert.doesNotMatch(await render(unmatched), /FuelOps vs/);
   assert.match(await render(null), /not available yet/);
 });
+test('evidence UI exposes shipment overhead without calling it a cost win and suppresses incomplete deltas', async () => {
+  const r = report(); Object.assign(r.scenarios[0].comparisons[0], { shipmentReduction: -12, shipmentReductionPercent: -120 });
+  assert.match(await render(r), /Shipment reduction vs threshold: -12 \(-120.00%\)/);
+  assert.match(await render(r), /not a cost measurement/);
+  r.status = 'RUNNING'; assert.doesNotMatch(await render(r), /Shipment reduction/);
+});

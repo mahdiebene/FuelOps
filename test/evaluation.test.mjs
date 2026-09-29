@@ -58,6 +58,13 @@ test('comparison reports losses/ties and handles a zero-unmet baseline without d
   assert.equal(compareRuns(a, b).unmetReductionPercent, -100);
   b.outcome.official.unmet_demand_liters = 0; assert.equal(compareRuns(a, b).unmetReductionPercent, null);
 });
+test('shipment comparisons retain overhead and null zero-baseline percentages', () => {
+  const a = run(), b = run(); a.outcome.allocations = 20; b.outcome.allocations = 10;
+  assert.equal(compareRuns(a, b).shipmentReduction, -10);
+  assert.equal(compareRuns(a, b).shipmentReductionPercent, -100);
+  b.outcome.allocations = 0; assert.equal(compareRuns(a, b).shipmentReductionPercent, null);
+  delete b.outcome.allocations; assert.equal(compareRuns(a, b).shipmentReduction, null);
+});
 test('outcome summary reconciles official totals and rejects duplicate shipment identities', () => {
   const metrics = { served_demand_liters: 450, unmet_demand_liters: 150, service_level: .75 };
   const summary = outcomeSummary(rows(), [shipment()], ['station-mirpur'], 2, metrics);
@@ -150,4 +157,17 @@ test('evaluation will not reset a world with unresolved durable intents', async 
     await assert.rejects(replay(sim, { policy: 'no-action', ticks: 1, scenario: { id: 'test', events: [] }, ledger }), /uncertain/);
     assert.deepEqual(calls, []);
   } finally { ledger.close(); }
+});
+test('batched replay reduces shipment churn versus original top-up on a matched deterministic fixture', async () => {
+  const results = [];
+  for (const policy of ['fuelops', 'fuelops-topup']) {
+    const { sim } = simulatedReplay(), ledger = new Ledger(':memory:');
+    try {
+      results.push(await replay(sim, { policy, ticks: 96, cadence: 4, scenario: { id: 'fixture-batching', events: [] }, ledger }));
+      assert.equal(ledger.confirmed().length, results.at(-1).actions);
+    } finally { ledger.close(); }
+  }
+  const comparison = compareRuns(...results);
+  assert.ok(comparison.matchedDemand); assert.ok(comparison.shipmentReduction > 0);
+  assert.equal(comparison.serviceGainPercentagePoints, 0);
 });

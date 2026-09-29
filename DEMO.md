@@ -1,5 +1,9 @@
 # First-round judge demo
 
+For the new candidate, use `F:\Mahdi\FuelOps\SECOND_JUDGING.md`. The original
+prepared-demo instructions below are historical; do not reset or modify that
+private world to rehearse the second-judging build.
+
 For an authorized remote deployment, set `FUELOPS_SSH_HOST` locally and open
 `F:\Mahdi\FuelOps\scripts\tunnel.ps1` (or pass its `-SshHost` argument). The helper
 uses your default SSH configuration and an already verified host key. For local
@@ -60,8 +64,9 @@ deployment/rehearsal. Pollinations explanation is optional and never dispatches.
 
 ## Explaining policy evidence
 
-The lab compares the unchanged FuelOps planner, a documented 25%/75% inventory
-threshold policy, and no-action. All use identical initial settings, four-tick
+The current lab compares batched FuelOps v2, the original v1 top-up reference,
+a documented 25%/75% inventory threshold policy, and no-action (20 runs).
+All use identical initial settings, four-tick
 decision opportunities and the same dispatch guards, for 96 paused ticks.
 Demand is recorded every tick and matched exactly before differences are reported.
 Read the report's actual status, horizon and cadence; an interrupted or mismatched
@@ -74,7 +79,7 @@ against this simple baseline into a claim about other teams or scored runs.
 Longer-horizon recovery, multiple seeds and running-speed execution remain separate
 verification tasks. Forecast error is measured, but reserve is still uncalibrated.
 
-### Verified result to quote
+### Historical v1 result to quote
 
 "Our isolated five-scenario comparison passed the matching-demand checks. Both
 FuelOps and a simple threshold policy achieved 100% service over 96 paused ticks;
@@ -87,3 +92,12 @@ Use `F:\Mahdi\FuelOps\BUILD_STATUS.md` for the full results and limitations, and
 `F:\Mahdi\FuelOps\artifacts\evaluation.json` for the measured report. The new report
 UI was verified locally against a read-only snapshot; it has NOT been deployed
 to the prepared demo. Do not promise judges it is already visible there.
+
+### Explaining the v2 change
+
+The local planner now waits for a forecast-based reorder point, then refills toward
+its upper target. A projected shortage can override the wait if the new delivery
+can help; it cannot override capacity or durable execution guards. The four-tick
+review allowance and 10% reserve remain uncalibrated heuristics, not guarantees.
+Use the separately verified v2 report, not the historical v1 numbers above, for
+any shipment-reduction claim. Do not present local changes as already deployed.
