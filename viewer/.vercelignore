@@ -4,3 +4,9 @@
 !app.js
 !snapshot.json
 !vercel.json
+!viewer
+!viewer/index.html
+!viewer/style.css
+!viewer/app.js
+!viewer/snapshot.json
+!viewer/vercel.json

@@ -111,6 +111,9 @@ tabs.forEach((button, index) => {
     if (change || ['Home', 'End'].includes(event.key)) { event.preventDefault(); openTab(tabs[event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + change + tabs.length) % tabs.length], true); }
   };
 });
+document.querySelectorAll('[data-open-tab]').forEach(button => {
+  button.onclick = () => { openTab($(`tab-${button.dataset.openTab}`), true); $('page-title').scrollIntoView({ block: 'start' }); };
+});
 $('fuel').onchange = () => { if (data) stations(); }; $('scenario').onchange = () => { if (data) comparison(); }; $('retry').onclick = load;
 $('download').onclick = () => {
   if (!data) return;

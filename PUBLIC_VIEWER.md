@@ -1,5 +1,17 @@
 # FuelOps public viewer
 
+## Emergency restoration — 2026-09-29
+
+The public alias returned 404 after a Git-triggered deployment produced no static
+output. Its build log showed the viewer's ignore rules being applied from the
+repository root. The rules now allow the same five public files in both flat
+viewer-root and `viewer/`-prefixed layouts, while still denying everything else.
+A clean, five-file CLI production release restored the site. The UI now includes
+quick presentation links, clearer introductory text, and improved card contrast.
+Snapshot data and private operator services are unchanged. Before publishing any
+later Git release, verify the public alias and its assets, not just Vercel's READY
+status: an empty deployment can also be marked READY.
+
 The public frontend is a separate static application in
 `F:\Mahdi\FuelOps\viewer`. It uses the established HTML/CSS/JavaScript stack,
 native SVG and no frontend dependencies. It must never be deployed from the

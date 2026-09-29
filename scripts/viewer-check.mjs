@@ -57,6 +57,12 @@ try {
   assert.equal(await evaluate('location.origin'), new URL(target).origin, 'No authentication redirect');
   assert.equal(await evaluate(`document.getElementById('tick').textContent`), 'Tick 26');
   assert.ok(await evaluate(`document.body.innerText.includes('not a live feed')`));
+  for (const tab of ['system', 'evidence']) {
+    await evaluate(`document.getElementById('tab-overview').click();document.querySelector('[data-open-tab="${tab}"]').click()`);
+    assert.ok(await evaluate(`!document.getElementById('${tab}').hidden && document.activeElement.id==='tab-${tab}'`), `Quick tour opens ${tab} and moves keyboard focus`);
+  }
+  await evaluate(`document.getElementById('tab-overview').click()`);
+  report.checks.push('New quick-tour actions open the correct view with keyboard focus');
   assert.equal(await evaluate(`document.querySelectorAll('svg .route-line').length`), JSON.parse(await readFile(resolve(root, 'viewer/snapshot.json'), 'utf8')).routes.length);
   await evaluate(`document.getElementById('fuel').value='DIESEL';document.getElementById('fuel').dispatchEvent(new Event('change'))`);
   assert.equal(await evaluate(`document.querySelectorAll('.fuel-row').length`), 4);

@@ -46,3 +46,9 @@ test('public viewer only deploys static allowlisted files and explicitly labels 
   assert.equal(snapshot.evaluation.scenarios.length, 5);
   assert.doesNotMatch(json, /idempotency_key|sqlite|operator_token|127\.0\.0\.1|\/opt\/|ssh|password|private_key/i);
 });
+
+test('viewer ignore rules preserve public assets for both viewer-root CLI and repository-root Git deployments', async () => {
+  const rules = (await readFile(new URL('../viewer/.vercelignore', import.meta.url), 'utf8')).trim().split(/\r?\n/);
+  const assets = ['index.html', 'style.css', 'app.js', 'snapshot.json', 'vercel.json'];
+  assert.deepEqual(rules, ['**', ...assets.map(name => `!${name}`), '!viewer', ...assets.map(name => `!viewer/${name}`)]);
+});
